@@ -4,40 +4,37 @@
     <div class="user-action">
       <b-button @click="showCreateUserModal">New user</b-button>
       <b-button @click="editSelectedUsers" :disabled="!hasSelectedUsers">Edit</b-button>
-      <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers">Delete</b-button>
+      <b-button @click="deleteSelectedUsers" :disabled="!hasSelectedUsers">Delete</b-button>
 
       <!-- Confirm delete user -->
       <b-modal
-        v-model="isDeleteConfirmationVisible"
-        title="Confirm Deletion"
-        ok-title="Yes, delete it!"
-        cancel-title="Cancel"
-        @ok="confirmDeleteUser"
-        ok-variant="danger" 
-        hide-footer
-        centered 
-      >
-        <div class="text-center">
-          <div class="icon-warning"><i class="ri-error-warning-line"></i></div>
-          <b>Are you sure you want to delete "{{ selectedUser?.fullName }}" account?</b>
-          <p>You won't be able to revert this!</p>
+      v-model="isDeleteConfirmationVisible"
+      title="Confirm Deletion"
+      ok-title="Yes, delete it!"
+      cancel-title="Cancel"
+      @ok="confirmDeleteUser"
+      ok-variant="danger" 
+      hide-footer
+    >
+      <template #modal-title>
+        <div class="d-flex align-items-center">
+          <b-icon icon="exclamation-triangle" variant="warning" class="mr-2"></b-icon>
+          <span>Are you sure you want to delete "{{ selectedUser?.fullName }}" account?</span>
         </div>
-        <div class="text-center">
-          <b-button variant="danger" @click="confirmDeleteUser">Yes, delete it!</b-button>
-          <b-button @click="isDeleteConfirmationVisible = false">Cancel</b-button>
-        </div>
-      </b-modal>
+      </template>
+      <p>You won't be able to revert this!</p>
+      <template #modal-footer>
+        <b-button variant="danger" @click="confirmDeleteUser">Yes, delete it!</b-button>
+        <b-button @click="isDeleteConfirmationVisible = false">Cancel</b-button>
+      </template>
+    </b-modal>
+      
     </div>
 
     <!-- create user -->
     <CreateUserModal
       v-model="isCreateUserModalVisible"
     ></CreateUserModal>
-
-    <!-- Edit user -->
-    <!-- <EditUserModal
-      v-model="isEditUserModalVisible"
-    ></EditUserModal> -->
 
     <b-table
       v-if="users && users.length > 0"
@@ -48,14 +45,11 @@
       responsive
       v-model="selectedUsers"
     >
-      <template #cell(select)="data">
+      <template #cell(fullName)="data">
         <b-form-checkbox
           v-model="data.item.selected"
           @change="updateSelectedUsers(data.item)"
         ></b-form-checkbox>
-      </template>
-
-      <template #cell(fullName)="data">
         <strong>{{ data.item.fullName }}</strong>
         <p>{{ data.item.email }}</p>
       </template>
@@ -83,7 +77,6 @@
   import { defineComponent, onMounted, computed, ref } from 'vue';
   import { useUserStore } from '@/store/userStore';
   import CreateUserModal from '@/components/account/CreateUserModal.vue';
-  // import EditUserModal from '@/components/account/EditUserModal.vue';
 
   export default defineComponent({
     name: 'User',
@@ -97,7 +90,6 @@
       const isCreateUserModalVisible = ref(false);
       const isDeleteConfirmationVisible = ref(false);
       const selectedUser = ref(null);
-      // const isEditUserModalVisible = ref(false);
 
       onMounted(() => {
         userStore.fetchUsers();
@@ -105,7 +97,7 @@
       
       const users = computed(() => userStore.users);
       const fields = [
-        { key: 'select', label: '' },
+        { key: 'select', label: ' ' },
         { key: 'fullName', label: 'User' },
         { key: 'department', label: 'Department' },
         { key: 'roles', label: 'Roles' },
@@ -124,7 +116,7 @@
       // Delete user
       const showDeleteConfirmation = () => {
         if ( hasSelectedUsers.value ) {
-          selectedUser.value = selectedUsers.value[0];
+          selectedUser.value = selectedUser.value[0];
           isDeleteConfirmationVisible.value = true;
         }
       };
@@ -146,17 +138,15 @@
         selectedUsers.value = []; 
       };
 
-      // select user
+      // 
       const hasSelectedUsers = computed( () => selectedUsers.value.length > 0 );
 
-      // Show modal create
       const showCreateUserModal = () => {
         isCreateUserModalVisible.value = true;
       };
 
-      // Edit user
       const editSelectedUsers = () => {
-        // isEditUserModalVisible.value = true;
+
       };
 
       return {

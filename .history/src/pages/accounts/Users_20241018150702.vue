@@ -8,36 +8,32 @@
 
       <!-- Confirm delete user -->
       <b-modal
-        v-model="isDeleteConfirmationVisible"
-        title="Confirm Deletion"
-        ok-title="Yes, delete it!"
-        cancel-title="Cancel"
-        @ok="confirmDeleteUser"
-        ok-variant="danger" 
-        hide-footer
-        centered 
-      >
-        <div class="text-center">
-          <div class="icon-warning"><i class="ri-error-warning-line"></i></div>
-          <b>Are you sure you want to delete "{{ selectedUser?.fullName }}" account?</b>
-          <p>You won't be able to revert this!</p>
-        </div>
-        <div class="text-center">
-          <b-button variant="danger" @click="confirmDeleteUser">Yes, delete it!</b-button>
-          <b-button @click="isDeleteConfirmationVisible = false">Cancel</b-button>
-        </div>
-      </b-modal>
+      v-model="isDeleteConfirmationVisible"
+      title="Confirm Deletion"
+      ok-title="Yes, delete it!"
+      cancel-title="Cancel"
+      @ok="confirmDeleteUser"
+      ok-variant="danger" 
+      hide-footer
+      centered 
+    >
+      <div class="text-center">
+        <div class="icon-warning"><i class="ri-error-warning-line"></i></div>
+        <b>Are you sure you want to delete "{{ selectedUser?.fullName }}" account?</b>
+        <p>You won't be able to revert this!</p>
+      </div>
+      <div class="text-center">
+        <b-button variant="danger" @click="confirmDeleteUser">Yes, delete it!</b-button>
+        <b-button @click="isDeleteConfirmationVisible = false">Cancel</b-button>
+      </div>
+    </b-modal>
+      
     </div>
 
     <!-- create user -->
     <CreateUserModal
       v-model="isCreateUserModalVisible"
     ></CreateUserModal>
-
-    <!-- Edit user -->
-    <!-- <EditUserModal
-      v-model="isEditUserModalVisible"
-    ></EditUserModal> -->
 
     <b-table
       v-if="users && users.length > 0"
@@ -48,28 +44,23 @@
       responsive
       v-model="selectedUsers"
     >
-      <template #cell(select)="data">
-        <b-form-checkbox
-          v-model="data.item.selected"
-          @change="updateSelectedUsers(data.item)"
-        ></b-form-checkbox>
-      </template>
-
-      <template #cell(fullName)="data">
-        <strong>{{ data.item.fullName }}</strong>
-        <p>{{ data.item.email }}</p>
-      </template>
-      <template #cell(department)="data">
-        {{ data.item.department }}
-      </template>
-      <template #cell(roles)="data">
-        {{ data.item.roles[0] }}
-      </template>
-      <template #cell(twoFAEnabled)="data">
-        {{ data.item.twoFAEnabled ? 'Enabled' : 'Disabled' }}
-      </template>
-      <template #cell(locked)="data">
-        {{ data.item.lockedOut ? 'Locked' : 'Unlocked' }}
+      <template #row="rowData">
+        <tr @click="toggleSelectUser(rowData.item)">
+          <td>
+            <b-form-checkbox
+              v-model="rowData.item.selected"
+              @change="updateSelectedUsers(rowData.item)"
+            ></b-form-checkbox>
+          </td>
+          <td>
+            <strong>{{ rowData.item.fullName }}</strong>
+            <p>{{ rowData.item.email }}</p>
+          </td>
+          <td>{{ rowData.item.department }}</td>
+          <td>{{ rowData.item.roles[0] }}</td>
+          <td>{{ rowData.item.twoFAEnabled ? 'Enabled' : 'Disabled' }}</td>
+          <td>{{ rowData.item.lockedOut ? 'Locked' : 'Unlocked' }}</td>
+        </tr>
       </template>
     </b-table>
 
@@ -83,7 +74,6 @@
   import { defineComponent, onMounted, computed, ref } from 'vue';
   import { useUserStore } from '@/store/userStore';
   import CreateUserModal from '@/components/account/CreateUserModal.vue';
-  // import EditUserModal from '@/components/account/EditUserModal.vue';
 
   export default defineComponent({
     name: 'User',
@@ -97,7 +87,6 @@
       const isCreateUserModalVisible = ref(false);
       const isDeleteConfirmationVisible = ref(false);
       const selectedUser = ref(null);
-      // const isEditUserModalVisible = ref(false);
 
       onMounted(() => {
         userStore.fetchUsers();
@@ -146,17 +135,15 @@
         selectedUsers.value = []; 
       };
 
-      // select user
+      // 
       const hasSelectedUsers = computed( () => selectedUsers.value.length > 0 );
 
-      // Show modal create
       const showCreateUserModal = () => {
         isCreateUserModalVisible.value = true;
       };
 
-      // Edit user
       const editSelectedUsers = () => {
-        // isEditUserModalVisible.value = true;
+
       };
 
       return {

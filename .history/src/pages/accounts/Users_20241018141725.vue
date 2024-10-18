@@ -4,40 +4,13 @@
     <div class="user-action">
       <b-button @click="showCreateUserModal">New user</b-button>
       <b-button @click="editSelectedUsers" :disabled="!hasSelectedUsers">Edit</b-button>
-      <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers">Delete</b-button>
-
-      <!-- Confirm delete user -->
-      <b-modal
-        v-model="isDeleteConfirmationVisible"
-        title="Confirm Deletion"
-        ok-title="Yes, delete it!"
-        cancel-title="Cancel"
-        @ok="confirmDeleteUser"
-        ok-variant="danger" 
-        hide-footer
-        centered 
-      >
-        <div class="text-center">
-          <div class="icon-warning"><i class="ri-error-warning-line"></i></div>
-          <b>Are you sure you want to delete "{{ selectedUser?.fullName }}" account?</b>
-          <p>You won't be able to revert this!</p>
-        </div>
-        <div class="text-center">
-          <b-button variant="danger" @click="confirmDeleteUser">Yes, delete it!</b-button>
-          <b-button @click="isDeleteConfirmationVisible = false">Cancel</b-button>
-        </div>
-      </b-modal>
+      <b-button @click="deleteSelectedUsers" :disabled="!hasSelectedUsers">Delete</b-button>
     </div>
 
     <!-- create user -->
     <CreateUserModal
       v-model="isCreateUserModalVisible"
     ></CreateUserModal>
-
-    <!-- Edit user -->
-    <!-- <EditUserModal
-      v-model="isEditUserModalVisible"
-    ></EditUserModal> -->
 
     <b-table
       v-if="users && users.length > 0"
@@ -48,14 +21,11 @@
       responsive
       v-model="selectedUsers"
     >
-      <template #cell(select)="data">
+      <template #cell(fullName)="data">
         <b-form-checkbox
           v-model="data.item.selected"
           @change="updateSelectedUsers(data.item)"
         ></b-form-checkbox>
-      </template>
-
-      <template #cell(fullName)="data">
         <strong>{{ data.item.fullName }}</strong>
         <p>{{ data.item.email }}</p>
       </template>
@@ -82,8 +52,7 @@
 <script lang="ts">
   import { defineComponent, onMounted, computed, ref } from 'vue';
   import { useUserStore } from '@/store/userStore';
-  import CreateUserModal from '@/components/account/CreateUserModal.vue';
-  // import EditUserModal from '@/components/account/EditUserModal.vue';
+  import CreateUserModal from '@/components/user/CreateUserModal.vue';
 
   export default defineComponent({
     name: 'User',
@@ -95,9 +64,6 @@
       const userStore = useUserStore();
       const selectedUsers = ref([]);
       const isCreateUserModalVisible = ref(false);
-      const isDeleteConfirmationVisible = ref(false);
-      const selectedUser = ref(null);
-      // const isEditUserModalVisible = ref(false);
 
       onMounted(() => {
         userStore.fetchUsers();
@@ -105,7 +71,7 @@
       
       const users = computed(() => userStore.users);
       const fields = [
-        { key: 'select', label: '' },
+        { key: 'select', label: ' ' },
         { key: 'fullName', label: 'User' },
         { key: 'department', label: 'Department' },
         { key: 'roles', label: 'Roles' },
@@ -121,42 +87,25 @@
         }
       };
 
-      // Delete user
-      const showDeleteConfirmation = () => {
-        if ( hasSelectedUsers.value ) {
-          selectedUser.value = selectedUsers.value[0];
-          isDeleteConfirmationVisible.value = true;
-        }
-      };
-
-      const confirmDeleteUser = async () => {
-        if ( selectedUser.value ) {
-          await userStore.deleteUser(selectedUser.value.id);
-          selectedUser.value = [];
-          isDeleteConfirmationVisible.value = false;
-        }
-      };
-
       const deleteSelectedUsers = async () => {
-        for (const user of selectedUsers.value) {
-          if (user.selected) {
-            await userStore.deleteUser(user.id);
-          }
+        if ( selectedUsers.value.length > 0 ) {
+          await userStore.deleteUser(selectedUsers.value[0].id);
+          selectedUsers.value = [];
         }
-        selectedUsers.value = []; 
       };
 
-      // select user
       const hasSelectedUsers = computed( () => selectedUsers.value.length > 0 );
 
-      // Show modal create
       const showCreateUserModal = () => {
         isCreateUserModalVisible.value = true;
       };
 
-      // Edit user
       const editSelectedUsers = () => {
-        // isEditUserModalVisible.value = true;
+
+      };
+
+      const deleteSelectedUsers = () => {
+
       };
 
       return {
@@ -168,10 +117,6 @@
         isCreateUserModalVisible,
         editSelectedUsers,
         deleteSelectedUsers,
-        isDeleteConfirmationVisible,
-        showDeleteConfirmation,
-        confirmDeleteUser,
-        selectedUser,
         updateSelectedUsers,
       };
     },

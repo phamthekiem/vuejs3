@@ -89,6 +89,7 @@
     name: 'User',
     components: {
       CreateUserModal,
+      EditUserModal,
     },
 
     setup() {

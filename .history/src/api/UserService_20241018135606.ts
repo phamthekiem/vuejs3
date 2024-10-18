@@ -22,20 +22,6 @@ export const getUsers = async () => {
   }
 };
 
-// Fetch roles
-export const getRoles = async () => {
-  try {
-    const response = await apiClient.get('/id/Role/GetNames', {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`, 
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error('Error fetch roles');
-  }
-};
-
 // Create uer
 export const createUser = async (userData) => {
   try {

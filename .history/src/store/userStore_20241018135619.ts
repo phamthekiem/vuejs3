@@ -1,4 +1,4 @@
-import { createUser, deleteUser, getRoles, getUsers, updateUser } from "@/api/UserService";
+import { createUser, deleteUser, getUsers, updateUser } from "@/api/UserService";
 import { defineStore } from "pinia";
 
 export interface User {
@@ -29,15 +29,6 @@ export const useUserStore = defineStore('user', {
         console.log('store:', this.users); 
       } catch (error) {
         console.error('Error fetch', error);
-      }
-    },
-
-    async fetchRoles() {
-      try {
-        const response = await getRoles();
-        this.roles = response.data.items.map(role => role.name);
-      } catch (error) {
-        console.error('Error', error);
       }
     },
 
