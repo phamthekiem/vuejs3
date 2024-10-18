@@ -1,6 +1,6 @@
 <template>
   <b-modal 
-  v-model="modalValue" 
+  v-model="modelValue" 
   title="Edit User" 
   @hide="resetForm"
   hide-footer
@@ -36,7 +36,7 @@
     name: 'EditUserModal',
 
     props: {
-      modalValue: {
+      modelValue: {
         type: Boolean,
         required: true,
       },
@@ -78,7 +78,7 @@
           const response = await userStore.updateUser(newUser.value); // Call updateUser with newUser data
           console.log(response, 'hit Edit');
           
-          emit('update:modalValue', false);
+          emit('update:modelValue', false);
         } catch (error) {
           console.error('Error edit new user', error);
           alert('Failed to edit user. Please try again');
@@ -96,7 +96,7 @@
       };
 
       const closeModal = () => {
-        emit('update:modalValue', false);
+        emit('update:modelValue', false);
       };
 
       return {

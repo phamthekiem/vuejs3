@@ -159,10 +159,8 @@
       // Edit user
       const editSelectedUsers = () => {
         if (hasSelectedUsers.value) {
-          if (selectedUsers.value.length > 0) {
-            selectedUser.value = selectedUsers.value[0]; 
-            isEditUserModalVisible.value = true; 
-          }
+          // selectedUser.value = selectedUser.value[0];
+          isEditUserModalVisible.value = true; 
         }
       };
 

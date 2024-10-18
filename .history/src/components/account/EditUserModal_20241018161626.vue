@@ -1,11 +1,11 @@
 <template>
   <b-modal 
-  v-model="modalValue" 
+  v-model="modelValue" 
   title="Edit User" 
   @hide="resetForm"
   hide-footer
   >
-    <b-form @submit.prevent="editSelectedUser">
+    <b-form @submit.prevent="editUser">
       <b-form-group label="Email Address *">
         <b-form-input type="email" v-model="newUser.email" readonly></b-form-input>
       </b-form-group>
@@ -29,19 +29,15 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, watch } from 'vue';
+  import { defineComponent, ref, computed } from 'vue';
   import { useUserStore } from '@/store/userStore';
 
   export default defineComponent({
     name: 'EditUserModal',
 
     props: {
-      modalValue: {
+      modelValue: {
         type: Boolean,
-        required: true,
-      },
-      user: { // Add user prop to receive selected user data
-        type: Object,
         required: true,
       },
     },
@@ -56,12 +52,6 @@
         roles: null,
       });
 
-      watch(() => props.user, (newUserData) => {
-        if (newUserData) {
-          newUser.value = { ...newUserData }; // Populate form with selected user data
-        }
-      });
-
       const departmentOptions = ref([
         { value: null, text: '--Select--'},
         { value: 'CEO', text: 'CEO'},
@@ -70,20 +60,10 @@
         { value: 'Sale', text: 'Sale'},
       ]);
 
-      const roleOptions = computed(() => userStore.roles);
+      const roleOptions = computed( () => userStore.roles);
       userStore.fetchRoles();
       
-      const editSelectedUser = async () => {
-        try {
-          const response = await userStore.updateUser(newUser.value); // Call updateUser with newUser data
-          console.log(response, 'hit Edit');
-          
-          emit('update:modalValue', false);
-        } catch (error) {
-          console.error('Error edit new user', error);
-          alert('Failed to edit user. Please try again');
-        }
-      };
+      
 
       const resetForm = () => {
         newUser.value = {
@@ -96,7 +76,8 @@
       };
 
       const closeModal = () => {
-        emit('update:modalValue', false);
+        resetForm();
+        emit('update:modelValue', false);
       };
 
       return {
@@ -104,7 +85,6 @@
         closeModal,
         departmentOptions,
         roleOptions,
-        editSelectedUser,
       };
       
     },

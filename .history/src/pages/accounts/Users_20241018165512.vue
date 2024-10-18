@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>User List</h1>
-    <div class="user-action d-flex gap-3 justify-content-end mb-3">
+    <div class="user-action">
       <b-button @click="showCreateUserModal">New user</b-button>
       <b-button @click="editSelectedUsers" :disabled="!hasSelectedUsers">Edit</b-button>
       <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers">Delete</b-button>
@@ -159,10 +159,8 @@
       // Edit user
       const editSelectedUsers = () => {
         if (hasSelectedUsers.value) {
-          if (selectedUsers.value.length > 0) {
-            selectedUser.value = selectedUsers.value[0]; 
-            isEditUserModalVisible.value = true; 
-          }
+          // selectedUser.value = selectedUser.value[0];
+          isEditUserModalVisible.value = true; 
         }
       };
 
@@ -186,13 +184,3 @@
   });
 </script>
 
-<style lang="scss">
-  .table {
-    --bs-table-bg: no-repeat;
-    --bs-table-border-color: #ddd;
-    --bs-table-color: #ddd;
-    --bs-table-striped-color: #ddd;
-
-    border-color: #ccc6;
-  }
-</style>

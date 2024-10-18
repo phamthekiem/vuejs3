@@ -1,11 +1,11 @@
 <template>
   <b-modal 
-  v-model="modalValue" 
+  v-model="modelValue" 
   title="Edit User" 
   @hide="resetForm"
   hide-footer
   >
-    <b-form @submit.prevent="editSelectedUser">
+    <b-form @submit.prevent="editUser">
       <b-form-group label="Email Address *">
         <b-form-input type="email" v-model="newUser.email" readonly></b-form-input>
       </b-form-group>
@@ -36,12 +36,8 @@
     name: 'EditUserModal',
 
     props: {
-      modalValue: {
+      modelValue: {
         type: Boolean,
-        required: true,
-      },
-      user: { // Add user prop to receive selected user data
-        type: Object,
         required: true,
       },
     },
@@ -56,12 +52,6 @@
         roles: null,
       });
 
-      watch(() => props.user, (newUserData) => {
-        if (newUserData) {
-          newUser.value = { ...newUserData }; // Populate form with selected user data
-        }
-      });
-
       const departmentOptions = ref([
         { value: null, text: '--Select--'},
         { value: 'CEO', text: 'CEO'},
@@ -70,15 +60,28 @@
         { value: 'Sale', text: 'Sale'},
       ]);
 
-      const roleOptions = computed(() => userStore.roles);
+      const roleOptions = computed( () => userStore.roles);
       userStore.fetchRoles();
       
-      const editSelectedUser = async () => {
+      const editUser = async () => {
+        if ( !newUser.value.email ||
+        !newUser.value.userName ||
+        !newUser.value.password ||
+        !newUser.value.confirmPassword
+        ) {
+          return;
+        }
+
         try {
-          const response = await userStore.updateUser(newUser.value); // Call updateUser with newUser data
-          console.log(response, 'hit Edit');
-          
-          emit('update:modalValue', false);
+          const response = await userStore.updateUser(newUser.value);
+          if (response && response.success) { 
+            userStore.fetchUsers();
+            resetForm();
+            emit('update:modelValue', false);
+            alert('User created successfully!'); 
+          } else {
+            throw new Error('Failed to create user'); 
+          }
         } catch (error) {
           console.error('Error edit new user', error);
           alert('Failed to edit user. Please try again');
@@ -96,7 +99,7 @@
       };
 
       const closeModal = () => {
-        emit('update:modalValue', false);
+        emit('update:modelValue', false);
       };
 
       return {
@@ -104,7 +107,6 @@
         closeModal,
         departmentOptions,
         roleOptions,
-        editSelectedUser,
       };
       
     },

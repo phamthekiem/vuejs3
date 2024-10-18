@@ -159,9 +159,10 @@
       // Edit user
       const editSelectedUsers = () => {
         if (hasSelectedUsers.value) {
+          // Ensure selectedUsers is not empty
           if (selectedUsers.value.length > 0) {
-            selectedUser.value = selectedUsers.value[0]; 
-            isEditUserModalVisible.value = true; 
+            selectedUser.value = selectedUsers.value[0]; // Set the selected user to edit
+            isEditUserModalVisible.value = true; // Open the edit modal
           }
         }
       };
