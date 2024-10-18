@@ -1,4 +1,5 @@
 import { apiToken } from '@/config/token';
+import { User } from '@/store/userStore';
 import axios from 'axios';
 
 const apiClient = axios.create({
@@ -37,7 +38,7 @@ export const getRoles = async () => {
 };
 
 // Create uer
-export const createUser = async (userData) => {
+export const createUser = async (userData: User) => {
   try {
     const response = await apiClient.post('/id/User/Create', userData, {
       headers: {
@@ -51,7 +52,7 @@ export const createUser = async (userData) => {
 }
 
 // User profile
-export const getUserById = async (userId) => {
+export const getUserById = async (userId: string) => {
   try {
     const response = await apiClient.get(`/id/User/GetUser/${userId}`, {
       headers: {
@@ -65,7 +66,7 @@ export const getUserById = async (userId) => {
 }
 
 // Update user
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userId: string, userData: User) => {
   try {
     const response = await apiClient.put(`/id/User/Update/${userId}`, userData, {
       headers: {
@@ -79,7 +80,7 @@ export const updateUser = async (userId, userData) => {
 }
 
 // Delete user
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userId: string) => {
   try {
     const response = await apiClient.delete(`/id/User/Delete/${userId}`, {
       headers: {

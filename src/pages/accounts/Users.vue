@@ -3,7 +3,7 @@
     <h1>User List</h1>
     <div class="user-action d-flex gap-3 justify-content-end mb-3">
       <b-button @click="showCreateUserModal">New user</b-button>
-      <b-button @click="editSelectedUsers" :disabled="!hasSelectedUsers">Edit</b-button>
+      <b-button @click="editSelectedUsers(user)" :disabled="!hasSelectedUsers">Edit</b-button>
       <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers">Delete</b-button>
 
       <!-- Confirm delete user -->
@@ -32,13 +32,16 @@
     <!-- create user -->
     <CreateUserModal
       v-model="isCreateUserModalVisible"
+      :user="selectedUser" 
     ></CreateUserModal>
 
     <!-- Edit user -->
     <EditUserModal
-      v-model="isEditUserModalVisible"
+      :isVisible="isEditUserModalVisible"
       :user="selectedUser"
-    ></EditUserModal>
+      @update:isVisible="isEditUserModalVisible = $event"
+      @save="saveUserChanges"
+    />
 
     <b-table
       v-if="users && users.length > 0"
@@ -81,118 +84,127 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, onMounted, computed, ref } from 'vue';
-  import { useUserStore } from '@/store/userStore';
-  import CreateUserModal from '@/components/account/CreateUserModal.vue';
-  import EditUserModal from '@/components/account/EditUserModal.vue';
+import CreateUserModal from '@/components/account/CreateUserModal.vue';
+import EditUserModal from '@/components/account/EditUserModal.vue';
+import { useUserStore } from '@/store/userStore';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 
-  export default defineComponent({
-    name: 'User',
-    components: {
-      CreateUserModal,
-      EditUserModal,
-    },
+export default defineComponent({
+  name: 'User',
+  components: {
+    CreateUserModal,
+    EditUserModal,
+  },
 
-    setup() {
-      const userStore = useUserStore();
-      const selectedUsers = ref([]);
-      const isCreateUserModalVisible = ref(false);
-      const isDeleteConfirmationVisible = ref(false);
-      const selectedUser = ref(null);
-      const isEditUserModalVisible = ref(false);
+  setup() {
+    const userStore = useUserStore();
+    const selectedUsers = ref([]);
+    const isCreateUserModalVisible = ref(false);
+    const isDeleteConfirmationVisible = ref(false);
+    const selectedUser = ref(null);
+    const isEditUserModalVisible = ref(false);
 
-      onMounted(() => {
-        userStore.fetchUsers();
-      });
-      
-      const users = computed(() => userStore.users);
-      const fields = [
-        { key: 'select', label: '' },
-        { key: 'fullName', label: 'User' },
-        { key: 'department', label: 'Department' },
-        { key: 'roles', label: 'Roles' },
-        { key: 'twoFAEnabled', label: '2FA Enabled' },
-        { key: 'locked', label: 'Locked out' },
-      ];
+    onMounted(() => {
+      userStore.fetchUsers();
+    });
+    
+    const users = computed(() => userStore.users);
+    const fields = [
+      { key: 'select', label: '' },
+      { key: 'fullName', label: 'User' },
+      { key: 'department', label: 'Department' },
+      { key: 'roles', label: 'Roles' },
+      { key: 'twoFAEnabled', label: '2FA Enabled' },
+      { key: 'locked', label: 'Locked out' },
+    ];
 
-      const updateSelectedUsers = (user) => {
+    const updateSelectedUsers = (user) => {
+      if (user.selected) {
+        selectedUsers.value.push(user);
+      } else {
+        selectedUsers.value = selectedUsers.value.filter(u => u.id !== user.id);
+      }
+    };
+
+    // Delete user
+    const showDeleteConfirmation = () => {
+      if (hasSelectedUsers.value) {
+        selectedUser.value = selectedUsers.value[0];
+        isDeleteConfirmationVisible.value = true;
+      }
+    };
+
+    const confirmDeleteUser = async () => {
+      if (selectedUser.value) {
+        await userStore.deleteUser(selectedUser.value.id);
+        selectedUser.value = [];
+        isDeleteConfirmationVisible.value = false;
+      }
+    };
+
+    const deleteSelectedUsers = async () => {
+      for (const user of selectedUsers.value) {
         if (user.selected) {
-          selectedUsers.value.push(user);
-        } else {
-          selectedUsers.value = selectedUsers.value.filter(u => u.id !== user.id);
+          await userStore.deleteUser(user.id);
         }
-      };
+      }
+      selectedUsers.value = []; 
+    };
 
-      // Delete user
-      const showDeleteConfirmation = () => {
-        if ( hasSelectedUsers.value ) {
-          selectedUser.value = selectedUsers.value[0];
-          isDeleteConfirmationVisible.value = true;
+    // select user
+    const hasSelectedUsers = computed(() => selectedUsers.value.length > 0);
+
+    // Show modal create
+    const showCreateUserModal = () => {
+      isCreateUserModalVisible.value = true;
+    };
+
+    // Edit user
+    const editSelectedUsers = (user) => {
+      if (hasSelectedUsers.value) {
+        if (selectedUsers.value.length > 0) {
+          selectedUser.value = { ...user }; 
+          isEditUserModalVisible.value = true; 
         }
-      };
+      }
+    };
 
-      const confirmDeleteUser = async () => {
-        if ( selectedUser.value ) {
-          await userStore.deleteUser(selectedUser.value.id);
-          selectedUser.value = [];
-          isDeleteConfirmationVisible.value = false;
-        }
-      };
+    // Save user changes
+    const saveUserChanges = async () => {
+      if (selectedUser.value) {
+        await userStore.updateUser(selectedUser.value.id, userData);
+        isEditUserModalVisible.value = false;
+      }
+    };
 
-      const deleteSelectedUsers = async () => {
-        for (const user of selectedUsers.value) {
-          if (user.selected) {
-            await userStore.deleteUser(user.id);
-          }
-        }
-        selectedUsers.value = []; 
-      };
-
-      // select user
-      const hasSelectedUsers = computed( () => selectedUsers.value.length > 0 );
-
-      // Show modal create
-      const showCreateUserModal = () => {
-        isCreateUserModalVisible.value = true;
-      };
-
-      // Edit user
-      const editSelectedUsers = () => {
-        if (hasSelectedUsers.value) {
-          if (selectedUsers.value.length > 0) {
-            selectedUser.value = selectedUsers.value[0]; 
-            isEditUserModalVisible.value = true; 
-          }
-        }
-      };
-
-      return {
-        users,
-        fields,
-        selectedUsers,
-        hasSelectedUsers,
-        showCreateUserModal,
-        isCreateUserModalVisible,
-        editSelectedUsers,
-        deleteSelectedUsers,
-        isDeleteConfirmationVisible,
-        showDeleteConfirmation,
-        confirmDeleteUser,
-        selectedUser,
-        updateSelectedUsers,
-        isEditUserModalVisible,
-      };
-    },
-  });
+    return {
+      users,
+      fields,
+      selectedUsers,
+      hasSelectedUsers,
+      showCreateUserModal,
+      isCreateUserModalVisible,
+      editSelectedUsers,
+      deleteSelectedUsers,
+      isDeleteConfirmationVisible,
+      showDeleteConfirmation,
+      confirmDeleteUser,
+      selectedUser,
+      updateSelectedUsers,
+      isEditUserModalVisible,
+      saveUserChanges,
+    };
+  },
+});
 </script>
 
 <style lang="scss">
-  .table {
-    --bs-table-bg: no-repeat;
-    --bs-table-border-color: #ddd;
-    --bs-table-color: #ddd;
-    --bs-table-striped-color: #ddd;
+.table {
+  // --bs-table-bg: no-repeat;
+  // --bs-table-border-color: #ddd;
+  // --bs-table-color: #ddd;
+  // --bs-table-striped-color: #ddd;
 
-    border-color: #ccc6;
-  }
+  // border-color: #ccc6;
+}
 </style>

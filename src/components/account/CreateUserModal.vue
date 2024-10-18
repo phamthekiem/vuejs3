@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed } from 'vue';
   import { useUserStore } from '@/store/userStore';
+import { computed, defineComponent, ref } from 'vue';
 
   export default defineComponent({
     name: 'CreateUserModal',
@@ -94,6 +94,10 @@
         
         if (passwordMisMatch.value) {
           return; 
+        }
+
+        if ( emailExists.value ) {
+          return;
         }
 
         try {
