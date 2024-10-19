@@ -40,6 +40,7 @@ export const getRoles = async () => {
 // Create uer
 export const createUser = async (userData: User) => {
   try {
+    console.log('User data:', userData);
     const response = await apiClient.post('/id/User/Create', userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
@@ -68,7 +69,7 @@ export const getUserById = async (userId: string) => {
 // Update user
 export const updateUser = async (userData: User) => {
   try {
-    const response = await apiClient.put('/id/User/Update', userData, {      
+    const response = await apiClient.put('/id/User/Update', userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },

@@ -73,7 +73,8 @@ export const updateUser = async (userData: User) => {
         'Authorization': `Bearer ${apiToken}`, 
       },
     });
-    return response.data;
+    console.log('hit api response', userData);
+    return response.data || userData;
   } catch (error) {
     throw new Error ('Error update user');
   }

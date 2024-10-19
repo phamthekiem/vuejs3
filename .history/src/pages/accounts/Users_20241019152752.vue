@@ -67,7 +67,7 @@
         {{ data.item.department }}
       </template>
       <template #cell(roles)="data">
-        {{ data.item.roles }}
+        {{ data.item.roles[0] }}
       </template>
       <template #cell(twoFAEnabled)="data">
         {{ data.item.twoFAEnabled ? 'Enabled' : 'Disabled' }}
@@ -172,12 +172,8 @@ export default defineComponent({
     // Save user changes
     const saveUserChanges = async () => {
       if (selectedUser.value) {
-        if (typeof userStore.updateSelectedUser === 'function') {
-          await userStore.updateSelectedUser(selectedUser.value.id, selectedUser.value);
-          isEditUserModalVisible.value = false;
-        } else {
-          console.error('updateUser is not a function in userStore');
-        }
+        await userStore.updateUser(selectedUser.value.id, selectedUser.value);
+        isEditUserModalVisible.value = false;
       }
     };
 

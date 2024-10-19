@@ -89,16 +89,17 @@ export default defineComponent({
 
     const saveUserChanges = async () => {
       try {
-        const response = await userStore.updateSelectedUser(localUser.value); 
+        const response = await userStore.updateSelectedUser(localUser.value); // {{ edit_2 }} Gọi hàm với localUser.value
         console.log('Response edit:', response);
-        if (response && response.status === 'success') { 
+        if (response && response.status === 'success') { // Kiểm tra trạng thái
           console.log('hit succ Response:', response);
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
+          alert('User updated successfully!');
+          location.reload();
         } else {
-          alert('Failed to update user. Please try again'); 
+          alert('Failed to update user. Please try again'); // Thông báo nếu không thành công
         }
       } catch (error) {
         console.error('Update user failed', error);

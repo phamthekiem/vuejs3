@@ -172,12 +172,8 @@ export default defineComponent({
     // Save user changes
     const saveUserChanges = async () => {
       if (selectedUser.value) {
-        if (typeof userStore.updateSelectedUser === 'function') {
-          await userStore.updateSelectedUser(selectedUser.value.id, selectedUser.value);
-          isEditUserModalVisible.value = false;
-        } else {
-          console.error('updateUser is not a function in userStore');
-        }
+        await userStore.updateUser(selectedUser.value.id, selectedUser.value);
+        isEditUserModalVisible.value = false;
       }
     };
 

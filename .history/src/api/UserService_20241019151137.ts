@@ -67,8 +67,10 @@ export const getUserById = async (userId: string) => {
 
 // Update user
 export const updateUser = async (userData: User) => {
+  console.log('User data:', userData);
+
   try {
-    const response = await apiClient.put('/id/User/Update', userData, {      
+    const response = await apiClient.put('/id/User/Update', userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },

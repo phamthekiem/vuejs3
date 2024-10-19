@@ -96,7 +96,7 @@ export default defineComponent({
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
+          alert('User updated successfully!');
         } else {
           alert('Failed to update user. Please try again'); 
         }

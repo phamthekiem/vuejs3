@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', {
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
-        this.users.post(response);
+        this.users.push(response);
       } catch (error) {
         console.error('Error create', error);
       }
@@ -53,14 +53,18 @@ export const useUserStore = defineStore('user', {
     async updateSelectedUser(userData: User) {
       try {
         const response = await updateUser(userData);
-        const index = this.users.findIndex(user => user.id === userData.id);
-        if (index !== -1) {
-          this.users[index] = response;
+        if (response.success) {
+          const index = this.users.findIndex(user => user.id === userData.id);
+          if (index !== -1) {
+            this.users[index] = response.data; 
+          }
+          return response.data; 
+        } else {
+          console.error('Update failed:', response);
+          return null; 
         }
-        return { status: 'success', data: response }; 
       } catch (error) {
         console.error('Error store update', error);
-        return { status: 'error', message: error.message }; 
       }
     },
 

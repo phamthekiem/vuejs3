@@ -87,18 +87,15 @@ export default defineComponent({
 
     userStore.fetchRoles();
 
+    const localUser = ref<User>(props.user ? { ...props.user } : {} as User);
     const saveUserChanges = async () => {
       try {
-        const response = await userStore.updateSelectedUser(localUser.value); 
-        console.log('Response edit:', response);
-        if (response && response.status === 'success') { 
-          console.log('hit succ Response:', response);
+        const response = await userStore.updateUser(localUser.value as User);
+        if (response && response.success) {
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
-        } else {
-          alert('Failed to update user. Please try again'); 
+          alert('User updated successfully!');
         }
       } catch (error) {
         console.error('Update user failed', error);

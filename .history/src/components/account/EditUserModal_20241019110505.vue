@@ -8,7 +8,7 @@
   >
     <b-form @submit.prevent="saveUserChanges">
       <b-form-group label="Email Address *">
-        <b-form-input type="email" :placeholder="localUser.email" required readonly ></b-form-input>
+        <b-form-input type="email" placeholder="{{ localUser.email }}" required readonly ></b-form-input>
       </b-form-group>
       <b-form-group label="User Name *">
         <b-form-input v-model="localUser.userName" required></b-form-input>
@@ -20,10 +20,7 @@
         <b-form-select v-model="localUser.department" :options="departmentOptions"></b-form-select>
       </b-form-group>
       <b-form-group label="Roles">
-        <b-form-select 
-          v-model="localUser.roles" 
-          :options="roleOptions"
-        ></b-form-select>
+        <b-form-select v-model="localUser.roles" :options="roleOptions" multiple></b-form-select>
       </b-form-group>
       <b-button type="button" variant="secondary" @click="closeModal">Cancel</b-button>
       <b-button type="submit" variant="primary">Update User</b-button>
@@ -72,6 +69,9 @@ export default defineComponent({
       () => props.user,
       (newUser) => {
         localUser.value = { ...newUser };
+        if (newValue) {
+          localUser.value = { ...props.user };
+        }
       }
     );
 
@@ -83,22 +83,20 @@ export default defineComponent({
       { value: 'Sales', text: 'Sales' },
     ]);
 
-    const roleOptions = computed(() => userStore.roles);
+    const roleOptions = computed(() => userStore.roles.map(role => ({ value: role, text: role })));
 
     userStore.fetchRoles();
 
     const saveUserChanges = async () => {
+      console.log('User information before update:', localUser.value);
+
       try {
-        const response = await userStore.updateSelectedUser(localUser.value); 
-        console.log('Response edit:', response);
-        if (response && response.status === 'success') { 
-          console.log('hit succ Response:', response);
+        const response = await userStore.updateUser(localUser.value.id, localUser.value);
+        if (response && response.success) {
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
-        } else {
-          alert('Failed to update user. Please try again'); 
+          alert('User updated successfully!');
         }
       } catch (error) {
         console.error('Update user failed', error);
@@ -107,7 +105,7 @@ export default defineComponent({
     };
 
     const handleHide = () => {
-      localUser.value = { ...props.user };
+      // localUser.value = { ...props.user };
       emit('update:isVisible', false);
     };
 

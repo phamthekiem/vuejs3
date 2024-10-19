@@ -21,7 +21,7 @@
       </b-form-group>
       <b-form-group label="Roles">
         <b-form-select 
-          v-model="localUser.roles" 
+          v-model="localUser.roles && localUser.roles.length > 0 ? localUser.roles[0] : null" 
           :options="roleOptions"
         ></b-form-select>
       </b-form-group>
@@ -89,16 +89,12 @@ export default defineComponent({
 
     const saveUserChanges = async () => {
       try {
-        const response = await userStore.updateSelectedUser(localUser.value); 
-        console.log('Response edit:', response);
-        if (response && response.status === 'success') { 
-          console.log('hit succ Response:', response);
+        const response = await userStore.updateUser(localUser.value.id, localUser.value);
+        if (response && response.success) {
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
-        } else {
-          alert('Failed to update user. Please try again'); 
+          alert('User updated successfully!');
         }
       } catch (error) {
         console.error('Update user failed', error);

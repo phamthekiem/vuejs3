@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', {
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
-        this.users.post(response);
+        this.users.push(response);
       } catch (error) {
         console.error('Error create', error);
       }

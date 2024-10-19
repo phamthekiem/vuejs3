@@ -66,16 +66,18 @@ export const getUserById = async (userId: string) => {
 }
 
 // Update user
-export const updateUser = async (userData: User) => {
+export const updateUser = async (userId: string, userData: User) => {
+  console.log('User ID:', userId);
+console.log('User Data:', userData);
   try {
-    const response = await apiClient.put('/id/User/Update', userData, {      
+    const response = await apiClient.put(`/id/User/Update/${userId}`, userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },
     });
     return response.data;
   } catch (error) {
-    throw new Error ('Error update user');
+    throw new Error ('Error Create user');
   }
 }
 

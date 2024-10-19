@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', {
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
-        this.users.post(response);
+        this.users.push(response);
       } catch (error) {
         console.error('Error create', error);
       }
@@ -57,10 +57,10 @@ export const useUserStore = defineStore('user', {
         if (index !== -1) {
           this.users[index] = response;
         }
-        return { status: 'success', data: response }; 
+        return { status: 'success', data: response }; // {{ edit_1 }} Trả về đối tượng với trạng thái
       } catch (error) {
         console.error('Error store update', error);
-        return { status: 'error', message: error.message }; 
+        return { status: 'error', message: error.message }; // Trả về trạng thái lỗi
       }
     },
 

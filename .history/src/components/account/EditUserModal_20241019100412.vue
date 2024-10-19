@@ -6,9 +6,10 @@
     centered
     @hide="handleHide"
   >
+  {{ localUser }}
     <b-form @submit.prevent="saveUserChanges">
       <b-form-group label="Email Address *">
-        <b-form-input type="email" :placeholder="localUser.email" required readonly ></b-form-input>
+        <b-form-input type="email" v-model="localUser.email" required readonly></b-form-input>
       </b-form-group>
       <b-form-group label="User Name *">
         <b-form-input v-model="localUser.userName" required></b-form-input>
@@ -20,10 +21,7 @@
         <b-form-select v-model="localUser.department" :options="departmentOptions"></b-form-select>
       </b-form-group>
       <b-form-group label="Roles">
-        <b-form-select 
-          v-model="localUser.roles" 
-          :options="roleOptions"
-        ></b-form-select>
+        <b-form-select v-model="localUser.roles" :options="roleOptions"></b-form-select>
       </b-form-group>
       <b-button type="button" variant="secondary" @click="closeModal">Cancel</b-button>
       <b-button type="submit" variant="primary">Update User</b-button>
@@ -48,13 +46,11 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-
   emits: ['update:isVisible', 'save'],
-  
   setup(props, { emit }) {
     const userStore = useUserStore();
 
-    const localUser = ref(props.user ? { ...props.user } : {});
+    const localUser = ref({ ...props.user });
 
     const localIsVisible = ref(props.isVisible);
 
@@ -62,6 +58,7 @@ export default defineComponent({
       () => props.isVisible,
       (newValue) => {
         localIsVisible.value = newValue;
+        console.log(newValue, 'hit DATA')
         if (newValue) {
           localUser.value = { ...props.user };
         }
@@ -77,10 +74,10 @@ export default defineComponent({
 
     const departmentOptions = ref([
       { value: null, text: '--Select--' },
-      { value: 'IT', text: 'IT' },
-      { value: 'HR', text: 'HR' },
+      { value: 'CEO', text: 'CEO' },
+      { value: 'DEV', text: 'DEV' },
       { value: 'Design', text: 'Design' },
-      { value: 'Sales', text: 'Sales' },
+      { value: 'Sale', text: 'Sale' },
     ]);
 
     const roleOptions = computed(() => userStore.roles);
@@ -88,17 +85,15 @@ export default defineComponent({
     userStore.fetchRoles();
 
     const saveUserChanges = async () => {
+      console.log('User information before update:', localUser.value);
+
       try {
-        const response = await userStore.updateSelectedUser(localUser.value); 
-        console.log('Response edit:', response);
-        if (response && response.status === 'success') { 
-          console.log('hit succ Response:', response);
+        const response = await userStore.updateUser(localUser.value.id, localUser.value);
+        if (response && response.success) {
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);
-          window.location.reload();
-        } else {
-          alert('Failed to update user. Please try again'); 
+          alert('User updated successfully!');
         }
       } catch (error) {
         console.error('Update user failed', error);

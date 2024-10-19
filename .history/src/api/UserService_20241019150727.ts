@@ -68,14 +68,22 @@ export const getUserById = async (userId: string) => {
 // Update user
 export const updateUser = async (userData: User) => {
   try {
-    const response = await apiClient.put('/id/User/Update', userData, {      
+    console.log('Updating user with data:', userData); // Log the user data being sent
+    const response = await apiClient.put('/id/User/Update', userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },
     });
+    console.log('Response:', response.data);
     return response.data;
   } catch (error) {
-    throw new Error ('Error update user');
+    // Log the specific validation errors if available
+    if (error.response && error.response.data && error.response.data.errors) {
+      console.error('Validation errors:', error.response.data.errors);
+    } else {
+      console.error('Error details:', error.response?.data || error.message); // Log the error response
+    }
+    throw new Error('Error update user');
   }
 }
 
