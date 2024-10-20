@@ -1,24 +1,22 @@
 <template>
   <b-modal 
-  v-model="modelValue" 
-  title="Create New User" 
-  @hide="resetForm"
-  hide-footer
+    v-model="modelValue" 
+    title="Create New User" 
+    @hide="resetForm"
+    hide-footer
   >
     <b-form @submit.prevent="createNewUser">
       <b-form-group label="Email Address *">
-        <b-form-input type="email" v-model="newUser.email" required @blur="checkEmailExists"></b-form-input>
-        <b-form-text v-if="emailExists" style="color: #dc3545 !important;">Email has already been taken.</b-form-text>
+        <b-form-input type="email" v-model="newUser.email" required></b-form-input>
       </b-form-group>
       <b-form-group label="User Name *">
         <b-form-input v-model="newUser.userName" required></b-form-input>
       </b-form-group>
       <b-form-group label="Password *">
-        <b-form-input type="password" v-model="newUser.password" required @input="checkPasswordMatch"></b-form-input>
+        <b-form-input type="password" v-model="newUser.password" required></b-form-input>
       </b-form-group>
       <b-form-group label="Confirm password *">
-        <b-form-input type="password" v-model="newUser.confirmPassword" required @input="checkPasswordMatch"></b-form-input>
-        <b-form-text v-if="passwordMisMatch" style="color: #dc3545 !important;">'ConfirmPassword' and 'Password' do not match.</b-form-text>
+        <b-form-input type="password" v-model="newUser.confirmPassword" required></b-form-input>
       </b-form-group>
 
       <b-form-group label="Full Name">
@@ -30,6 +28,11 @@
       <b-form-group label="Roles">
         <b-form-select v-model="newUser.roles" :options="roleOptions"></b-form-select>
       </b-form-group>
+
+      <b-alert v-if="errorMessage" variant="danger" show>
+        {{ errorMessage }}
+      </b-alert>
+
       <b-button type="button" variant="secondary" @click="closeModal">Cancel</b-button>
       <b-button type="submit" variant="primary">Create User</b-button>
     </b-form>
@@ -37,114 +40,103 @@
 </template>
 
 <script lang="ts">
-  import { useUserStore } from '@/store/userStore';
+import { useUserStore } from '@/store/userStore';
 import { computed, defineComponent, ref } from 'vue';
 
-  export default defineComponent({
-    name: 'CreateUserModal',
-
-    props: {
-      isVisible: {
-        type: Boolean,
-        required: true,
-      },
+export default defineComponent({
+  name: 'CreateUserModal',
+  props: {
+    isVisible: {
+      type: Boolean,
+      required: true,
     },
+  },
+  setup(props, { emit }) {
+    const userStore = useUserStore();
+    const newUser = ref({
+      email: '',
+      userName: '',
+      password: '',
+      confirmPassword: '',
+      fullName: '',
+      department: null,
+      roles: [], // Đảm bảo roles là một mảng
+    });
 
-    setup(props, { emit }) {
-      const userStore = useUserStore();
-      const newUser = ref({
+    const departmentOptions = ref([
+      { value: null, text: '--Select--' },
+      { value: 'IT', text: 'IT' },
+      { value: 'HR', text: 'HR' },
+      { value: 'Design', text: 'Design' },
+      { value: 'Sales', text: 'Sales' },
+    ]);
+
+    const roleOptions = computed(() => userStore.roles);
+    userStore.fetchRoles();
+
+    const errorMessage = ref('');
+
+    const createNewUser = async () => {
+      errorMessage.value = '';
+      
+      // Validate required fields
+      if (!newUser.value.email || !newUser.value.userName || !newUser.value.password || !newUser.value.confirmPassword) {
+        errorMessage.value = 'Please fill out all required fields';
+        return;
+      }
+
+      // Validate password matching
+      if (newUser.value.password !== newUser.value.confirmPassword) {
+        errorMessage.value = 'Passwords do not match';
+        return;
+      }
+
+      // Ensure roles is an array
+      if (typeof newUser.value.roles === 'string') {
+        newUser.value.roles = [newUser.value.roles];
+      }
+
+      try {
+        const response = await userStore.createUser(newUser.value);
+        if (response && response.status === 'success') {
+          userStore.fetchUsers();
+          resetForm();
+          emit('update:modelValue', false);
+          alert('User created successfully!');
+        } else {
+          errorMessage.value = response.message || 'Failed to create user';
+        }
+      } catch (error) {
+        errorMessage.value = error.message || 'Failed to create user. Please try again';
+      }
+    };
+
+    const resetForm = () => {
+      newUser.value = {
         email: '',
         userName: '',
         password: '',
         confirmPassword: '',
         fullName: '',
         department: null,
-        roles: null,
-      });
-
-      const departmentOptions = ref([
-        { value: null, text: '--Select--' },
-        { value: 'IT', text: 'IT' },
-        { value: 'HR', text: 'HR' },
-        { value: 'Design', text: 'Design' },
-        { value: 'Sales', text: 'Sales' },
-      ]);
-
-      const emailExists = ref(false);
-      const checkEmailExists = async () => {
-        emailExists.value = await userStore.checkEmailExists(newUser.value.email);
+        roles: [],
       };
+      errorMessage.value = '';
+    };
 
-      const roleOptions = computed( () => userStore.roles);
-      userStore.fetchRoles();
+    const closeModal = () => {
+      resetForm();
+      emit('update:modelValue', false);
+    };
 
-      const passwordMisMatch = ref(false);
-      const checkPasswordMatch = () => {
-        passwordMisMatch.value = newUser.value.password !== newUser.value.confirmPassword;
-      };
-      
-      const createNewUser = async () => {
-        if ( !newUser.value.email ||
-        !newUser.value.userName ||
-        !newUser.value.password ||
-        !newUser.value.confirmPassword
-        ) {
-          return;
-        }
-        
-        if (passwordMisMatch.value) {
-          return; 
-        }
-
-        if ( emailExists.value ) {
-          return;
-        }
-
-        try {
-          const response = await userStore.createUser(newUser.value);
-          if (response && response.success) { 
-            userStore.fetchUsers();
-            resetForm();
-            emit('update:modelValue', false);
-            alert('User created successfully!'); 
-          } else {
-            throw new Error('Failed to create user'); 
-          }
-        } catch (error) {
-          console.error('Error create new user', error);
-          alert('Failed to create user. Please try again');
-        }
-      };
-
-      const resetForm = () => {
-        newUser.value = {
-          email: '',
-          userName: '',
-          password: '',
-          confirmPassword: '',
-          fullName: '',
-          department: null,
-          roles: null,
-        };
-      };
-
-      const closeModal = () => {
-        resetForm();
-        emit('update:modelValue', false);
-      };
-
-      return {
-        newUser,
-        createNewUser,
-        closeModal,
-        departmentOptions,
-        roleOptions,
-        passwordMisMatch,
-        checkPasswordMatch,
-      };
-      
-    },
-
-  });
-
+    return {
+      newUser,
+      createNewUser,
+      closeModal,
+      departmentOptions,
+      roleOptions,
+      errorMessage,
+    };
+  },
+});
 </script>

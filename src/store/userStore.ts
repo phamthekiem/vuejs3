@@ -23,6 +23,7 @@ export const useUserStore = defineStore('user', {
     currentPage: 1,
     totalUsers: 0,
     userPerPage: 5,
+    roles: [] as string[],
   }),
   actions: {
     async fetchUsers(page: number = 1) {
@@ -48,10 +49,13 @@ export const useUserStore = defineStore('user', {
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
-        console.log('hit store create:', response);
-        this.users.push(response);
+        if (response && response.data) {
+          this.users.push(response.data);
+          return { status: 'success', data: response.data };
+        }
+        return { status: 'error', message: 'No data returned' };
       } catch (error) {
-        console.error('Error create', error);
+        return { status: 'error', message: error.message };
       }
     },
 

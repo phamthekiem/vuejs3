@@ -14,7 +14,7 @@ export const getUsers = async (page: number, limit: number) => {
   try {
     const response = await apiClient.get(`/id/User/GetUsers?page=${page}&limit=${limit}`, {
       headers: {
-        'Authorization': `Bearer ${apiToken}`, 
+        'Authorization': `Bearer ${apiToken}`,
       },
     });
     return response.data;
@@ -40,14 +40,26 @@ export const getRoles = async () => {
 // Create uer
 export const createUser = async (userData: User) => {
   try {
+    // Gửi request tới API
     const response = await apiClient.post('/id/User/Create', userData, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },
     });
-    return response.data;
+
+    // Kiểm tra response thành công
+    if (response.data.success) {
+      return { status: 'success', data: response.data };
+    } else {
+      throw new Error(response.data.message || 'Error creating user');
+    }
   } catch (error) {
-    throw new Error ('Error Create user');
+    // Xử lý lỗi chi tiết từ API
+    if (error.response && error.response.data) {
+      console.error('API Error:', error.response.data);
+      throw new Error(error.response.data.message || 'Error creating user');
+    }
+    throw new Error('Error creating user');
   }
 }
 
