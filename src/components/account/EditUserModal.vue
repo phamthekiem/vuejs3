@@ -90,9 +90,7 @@ export default defineComponent({
     const saveUserChanges = async () => {
       try {
         const response = await userStore.updateSelectedUser(localUser.value); 
-        console.log('Response edit:', response);
         if (response && response.status === 'success') { 
-          console.log('hit succ Response:', response);
           userStore.fetchUsers();
           emit('save', localUser.value);
           emit('update:isVisible', false);

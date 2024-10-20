@@ -19,13 +19,17 @@ export interface User {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    users: [] as User[], 
+    users: [] as User[],
+    currentPage: 1,
+    totalUsers: 0,
+    userPerPage: 5,
   }),
   actions: {
-    async fetchUsers() {
+    async fetchUsers(page: number = 1) {
       try {
-        const response = await getUsers();
+        const response = await getUsers(page, this.userPerPage);
         this.users = response.data.items;
+        this.totalUsers = response.data.itemsCount;
         console.log('store:', this.users); 
       } catch (error) {
         console.error('Error fetch', error);
@@ -44,7 +48,8 @@ export const useUserStore = defineStore('user', {
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
-        this.users.post(response);
+        console.log('hit store create:', response);
+        this.users.push(response);
       } catch (error) {
         console.error('Error create', error);
       }

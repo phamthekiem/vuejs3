@@ -10,9 +10,9 @@ const apiClient = axios.create({
 });
 
 // Fetch user
-export const getUsers = async () => {
+export const getUsers = async (page: number, limit: number) => {
   try {
-    const response = await apiClient.get('/id/User/GetUsers', {
+    const response = await apiClient.get(`/id/User/GetUsers?page=${page}&limit=${limit}`, {
       headers: {
         'Authorization': `Bearer ${apiToken}`, 
       },
