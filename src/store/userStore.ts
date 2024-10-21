@@ -100,7 +100,7 @@ export const useUserStore = defineStore('user', {
     async fetchActivities(userId: string) {
       try {
         const response = await getActivities(userId);
-        console.log(response, 'response activities hit store');
+        // console.log(response, 'response activities hit store');
         return { status: 'success', data: response };
       } catch (error) {
         return { status: 'error', message: error.message };

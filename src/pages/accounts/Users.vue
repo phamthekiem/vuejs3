@@ -144,11 +144,14 @@ export default defineComponent({
     // watch(selectedUsers, (newUsers) => {
     //   newUsers.value = newVal;
     // });
-
+    const fetchActivities = async () => {
+      await userStore.fetchActivities(selectedUsers.value[0].id);
+    };
     const getActivityModal = () => {
       if (hasSelectedUsers.value) {
         selectedUser.value = selectedUsers.value[0]; 
         isActivityModalVisible.value = true;
+        fetchActivities();
       }
     };
 

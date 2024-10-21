@@ -10,6 +10,7 @@
   >
     <div>
       {{ user?.id }}
+      {{ activities }}
       <b-table :items="activities" :fields="fields" striped hover></b-table>
     </div>
   </b-modal>
@@ -40,7 +41,19 @@ export default defineComponent({
     { key: 'ip', label: 'IP' },
     { key: 'blocked', label: 'Blocked' },
     { key: 'userAgent', label: 'User Agent' },
+    { key: 'action', label: 'Action' },
     ];
+
+    const mapDataToTable = (data: any[]) => {
+      return data.map((item) => ({
+        signInAt: new Date(parseInt(item.SignedInAt) * 1000).toLocaleString(), 
+        expiresAt: new Date(parseInt(item.ExpiresAt) * 1000).toLocaleString(),
+        ip: item.IpAddress,
+        blocked: item.Blocked ? 'Yes' : 'No',
+        userAgent: item.UserAgent,
+        action: 'Some Action', 
+      }));
+    };
 
     const handleHide = () => {
       emit('update:isVisible', false);
@@ -50,24 +63,14 @@ export default defineComponent({
 
     onMounted(async () => {
       const userId = props.user?.id;
-
       if (userId) {
         try {
-          const response = await userStore.fetchActivities(userId);
-
+          const response = await userStore.fetchActivities(userId); 
           if (response && response.success) {
-            const parsedData = JSON.parse(response.data);
-            activities.value = parsedData.map(activity => ({
-              ip: activity.IpAddress,
-              userAgent: activity.UserAgent,
-              signInAt: new Date(activity.SignedInAt * 1000).toLocaleString(),
-              expiresAt: new Date(activity.ExpiresAt * 1000).toLocaleString(),
-              blocked: activity.Blocked ? 'Yes' : 'No',
-            }));
-
-            console.log(activities.value); // Kiểm tra giá trị
+            console.log('Response Data:', response.data);
+            activities.value = mapDataToTable(JSON.parse(response.data));
           } else {
-            console.error('Failed to fetch activities:', response?.message || 'Unknown error');
+            console.warn('Fetch activities response was not successful:', response);
           }
         } catch (error) {
           console.error('Error fetching activities:', error);
@@ -76,6 +79,7 @@ export default defineComponent({
         console.warn('User ID is not available.');
       }
     });
+
 
 
     return {
