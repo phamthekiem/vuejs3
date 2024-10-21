@@ -71,10 +71,10 @@ const userProfileList = [
 
               <div>
                 <div class="text-body-2 font-weight-medium text-high-emphasis">
-                  John Doe
+                  KiemPT
                 </div>
                 <div class="text-capitalize text-caption text-disabled">
-                  Admin
+                  Admin super
                 </div>
               </div>
             </div>

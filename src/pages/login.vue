@@ -45,26 +45,26 @@ const fetchUserData = async () => {
 onMounted(() => {
   fetchUserData();
   
-  const savedEmail = localStorage.getItem('userEmail');
+  // const savedEmail = localStorage.getItem('userEmail');
   const savedPassword = localStorage.getItem('userPassword');
   const loginTime = JSON.parse(localStorage.getItem('loginTime') || '0');
 
   const expirationTime = 30 * 60 * 1000;
-  if (savedEmail && savedPassword && (Date.now() - loginTime < expirationTime)) {
-    form.value.email = savedEmail;
+  if (savedPassword && (Date.now() - loginTime < expirationTime)) {
+    // form.value.email = savedEmail;
     form.value.password = savedPassword;
   } else {
-    localStorage.removeItem('userEmail');
+    // localStorage.removeItem('userEmail');
     localStorage.removeItem('userPassword');
     localStorage.removeItem('loginTime');
   }
 
 });
 
-// const userEmail = localStorage.getItem('userEmail');
-// if (userEmail) {
-//   form.value.email = userEmail;
-// }
+const userEmail = localStorage.getItem('userEmail');
+if (userEmail) {
+  form.value.email = userEmail;
+}
 
 const handleLogin = async () => {
   const { email, password, remember } = form.value;

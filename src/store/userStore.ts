@@ -1,6 +1,7 @@
 import {
   createUser,
   deleteUser,
+  getActivities,
   getRoles,
   getUsers,
   loginUser,
@@ -33,6 +34,7 @@ export const useUserStore = defineStore('user', {
     roles: [] as string[],
   }),
   actions: {
+    // Fetch users
     async fetchUsers(page: number = 1) {
       try {
         const response = await getUsers(page, this.userPerPage);
@@ -45,6 +47,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // Create user
     async createUser(userData: User) {
       try {
         const response = await createUser(userData);
@@ -58,6 +61,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // Update user
     async updateSelectedUser(userData: User) {
       try {
         const response = await updateUser(userData);
@@ -72,6 +76,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // Delete user
     async deleteUser(userId: string) {
       try {
         await deleteUser(userId);
@@ -85,6 +90,17 @@ export const useUserStore = defineStore('user', {
     async loginUser(email: string, password: string, reCaptcha: string, rememberMe: boolean) {
       try {
         const response = await loginUser(email, password, reCaptcha, rememberMe);
+        return { status: 'success', data: response };
+      } catch (error) {
+        return { status: 'error', message: error.message };
+      }
+    },
+
+    // Fetch activities
+    async fetchActivities(userId: string) {
+      try {
+        const response = await getActivities(userId);
+        console.log(response, 'response activities hit store');
         return { status: 'success', data: response };
       } catch (error) {
         return { status: 'error', message: error.message };

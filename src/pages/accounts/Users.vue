@@ -11,9 +11,11 @@
       </div>
 
       <div class="user-action d-flex gap-3 justify-content-end">
-        <b-button @click="showCreateUserModal">New user</b-button>
-        <b-button @click="editSelectedUsers(user)" :disabled="!hasSelectedUsers">Edit</b-button>
-        <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers">Delete</b-button>
+        <b-button @click="getActivityModal" :disabled="!hasSelectedUsers"><i class="ri-pulse-line"></i> Activity</b-button>
+        <b-button @click="showCreateUserModal"><i class="ri-add-line"></i> New user</b-button>
+        <b-button @click="editSelectedUsers(user)" :disabled="!hasSelectedUsers"><i class="ri-ball-pen-line"></i> Edit</b-button>
+        <b-button @click="showDeleteConfirmation" :disabled="!hasSelectedUsers"><i class="ri-delete-bin-line"></i> Delete</b-button>
+        <b-button @click="revokeAll" :disabled="!hasSelectedUsers"><i class="ri-close-circle-line"></i> Revoke All</b-button>
 
         <!-- Confirm delete user -->
         <b-modal
@@ -38,6 +40,14 @@
         </b-modal>
       </div>
     </div>
+
+    <!-- Activity modal -->
+    <ActivityModal
+      v-model="isActivityModalVisible"
+      :isVisible="isActivityModalVisible"
+      :user="selectedUser"
+      @update:isVisible="isActivityModalVisible = $event"
+    ></ActivityModal>
 
     <!-- create user -->
     <CreateUserModal
@@ -104,6 +114,7 @@
 </template>
 
 <script lang="ts">
+import ActivityModal from '@/components/account/ActivityModal.vue';
 import CreateUserModal from '@/components/account/CreateUserModal.vue';
 import EditUserModal from '@/components/account/EditUserModal.vue';
 import { useUserStore } from '@/store/userStore';
@@ -114,6 +125,7 @@ export default defineComponent({
   components: {
     CreateUserModal,
     EditUserModal,
+    ActivityModal,
   },
 
   setup() {
@@ -124,6 +136,21 @@ export default defineComponent({
     const selectedUser = ref(null);
     const isEditUserModalVisible = ref(false);
     const searchQuery = ref('');
+
+    // Activity modal
+    const isActivityModalVisible = ref(false);
+    const newUsers = ref([]);
+
+    // watch(selectedUsers, (newUsers) => {
+    //   newUsers.value = newVal;
+    // });
+
+    const getActivityModal = () => {
+      if (hasSelectedUsers.value) {
+        selectedUser.value = selectedUsers.value[0]; 
+        isActivityModalVisible.value = true;
+      }
+    };
 
     // Pagination
     const currentPage = ref(1);
@@ -247,6 +274,9 @@ export default defineComponent({
       currentPage,
       usersPerPage,
       totalUsers,
+      getActivityModal,
+      isActivityModalVisible,
+      // newUsers,
     };
   },
 });

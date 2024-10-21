@@ -102,6 +102,19 @@ export const loginUser = async (email: string, password: string, reCaptcha: stri
   }
 }
 
+// Fetch activities
+export const getActivities = async (userId: string) => {
+  try {
+    const response = await apiClient.get(`/id/User/GetActivity/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`, 
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Error fetch activities');
+  }
+}
 
 // Fetch roles
 export const getRoles = async () => {
