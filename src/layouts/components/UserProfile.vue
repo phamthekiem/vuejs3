@@ -71,7 +71,7 @@ const userProfileList = [
 
               <div>
                 <div class="text-body-2 font-weight-medium text-high-emphasis">
-                  KiemPT
+                  Test
                 </div>
                 <div class="text-capitalize text-caption text-disabled">
                   Admin super

@@ -6,19 +6,16 @@
     centered
     dialog-class="modal-full-width"
     size="xl"
-    @hide="handleHide" 
+    @hide="handleHide"
   >
     <div>
-      {{ user?.id }}
-      {{ activities }}
-      <b-table :items="activities" :fields="fields" striped hover></b-table>
+      <b-table :items="mappedActivities" :fields="fields" striped hover></b-table>
     </div>
   </b-modal>
 </template>
 
 <script lang="ts">
-import { useUserStore } from '@/store/userStore';
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ActivityModal',
@@ -27,66 +24,82 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    user: {
-      type: Object,
-      default: null,
+    activities: {
+      type: Object, 
+      default: () => ({}),
     },
   },
   setup(props, { emit }) {
-    const userStore = useUserStore();
-    const activities = ref([]);
     const fields = [
-    { key: 'signInAt', label: 'Sign In At' },
-    { key: 'expiresAt', label: 'Expires At' },
-    { key: 'ip', label: 'IP' },
-    { key: 'blocked', label: 'Blocked' },
-    { key: 'userAgent', label: 'User Agent' },
-    { key: 'action', label: 'Action' },
+      { key: 'signInAt', label: 'Sign In At' },
+      { key: 'expiresAt', label: 'Expires At' },
+      { key: 'ip', label: 'IP' },
+      { key: 'blocked', label: 'Blocked' },
+      { key: 'userAgent', label: 'User Agent' },
+      { key: 'action', label: 'Action' },
     ];
 
-    const mapDataToTable = (data: any[]) => {
-      return data.map((item) => ({
-        signInAt: new Date(parseInt(item.SignedInAt) * 1000).toLocaleString(), 
-        expiresAt: new Date(parseInt(item.ExpiresAt) * 1000).toLocaleString(),
-        ip: item.IpAddress,
-        blocked: item.Blocked ? 'Yes' : 'No',
-        userAgent: item.UserAgent,
-        action: 'Some Action', 
-      }));
-    };
+    const parsedActivities = computed(() => {
+      let data = [];
+
+      if (props.activities && props.activities.data) {
+        try {
+          data = JSON.parse(props.activities.data);
+        } catch (error) {
+          console.error('Error parsing activities JSON:', error);
+        }
+      }
+      return data;
+    });
+
+    const mappedActivities = computed(() => {
+      return Array.isArray(parsedActivities.value)
+        ? parsedActivities.value.map((item: any) => ({
+            signInAt: new Date(parseInt(item.SignedInAt) * 1000).toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+            }),
+            expiresAt: new Date(parseInt(item.ExpiresAt) * 1000).toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+            }),
+
+            ip: item.IpAddress,
+            blocked: item.Blocked ? 'Blocked' : 'Active',
+            userAgent: item.UserAgent,
+            action: 'Revoke',
+          }))
+        : [];
+    });
 
     const handleHide = () => {
       emit('update:isVisible', false);
-      activities.value = [];
-      // window.location.reload();
     };
 
-    onMounted(async () => {
-      const userId = props.user?.id;
-      if (userId) {
-        try {
-          const response = await userStore.fetchActivities(userId); 
-          if (response && response.success) {
-            console.log('Response Data:', response.data);
-            activities.value = mapDataToTable(JSON.parse(response.data));
-          } else {
-            console.warn('Fetch activities response was not successful:', response);
-          }
-        } catch (error) {
-          console.error('Error fetching activities:', error);
-        }
-      } else {
-        console.warn('User ID is not available.');
-      }
-    });
-
-
-
     return {
-      activities,
       fields,
-      handleHide, 
+      mappedActivities,
+      handleHide,
     };
   },
 });
 </script>
+
+<style>
+@media (min-width: 1200px) {
+  .modal-full-width {
+    --bs-modal-width: 100%;
+  }
+}
+
+</style>

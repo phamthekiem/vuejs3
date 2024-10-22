@@ -46,6 +46,7 @@
       v-model="isActivityModalVisible"
       :isVisible="isActivityModalVisible"
       :user="selectedUser"
+      :activities="newUsers"
       @update:isVisible="isActivityModalVisible = $event"
     ></ActivityModal>
 
@@ -141,17 +142,24 @@ export default defineComponent({
     const isActivityModalVisible = ref(false);
     const newUsers = ref([]);
 
-    // watch(selectedUsers, (newUsers) => {
-    //   newUsers.value = newVal;
-    // });
     const fetchActivities = async () => {
-      await userStore.fetchActivities(selectedUsers.value[0].id);
+      const result = await userStore.fetchActivities(selectedUsers.value[0].id);
+      if (result.status === 'success') {
+        if ( typeof result.data === 'string') {
+          newUsers.value = JSON.parse(result.data);
+        } else {
+          newUsers.value = result.data;
+        }
+      } else {
+        console.error('Error fetching activities:', result.message);
+      }
     };
-    const getActivityModal = () => {
+    const getActivityModal = async () => {
       if (hasSelectedUsers.value) {
         selectedUser.value = selectedUsers.value[0]; 
+        await fetchActivities();
         isActivityModalVisible.value = true;
-        fetchActivities();
+        console.log(newUsers.value, 'Data before opening modal');
       }
     };
 
@@ -167,7 +175,6 @@ export default defineComponent({
 
     onMounted(() => {
       fetchUsers();
-      // fetchUsers(currentPage.value);
     });
     
     const users = computed(() => userStore.users);
@@ -279,7 +286,7 @@ export default defineComponent({
       totalUsers,
       getActivityModal,
       isActivityModalVisible,
-      // newUsers,
+      newUsers,
     };
   },
 });
