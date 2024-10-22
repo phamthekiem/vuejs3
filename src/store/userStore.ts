@@ -5,6 +5,8 @@ import {
   getRoles,
   getUsers,
   loginUser,
+  revokeAll,
+  revokeUser,
   updateUser
 } from "@/api/UserService";
 import { defineStore } from "pinia";
@@ -100,6 +102,26 @@ export const useUserStore = defineStore('user', {
     async fetchActivities(userId: string) {
       try {
         const response = await getActivities(userId);
+        return { status: 'success', data: response };
+      } catch (error) {
+        return { status: 'error', message: error.message };
+      }
+    },
+
+    // Revoke user
+    async revokeUser(userId: string, signedInAt: string) {
+      try {
+        const response = await revokeUser(userId, signedInAt);
+        return { status: 'success', data: response };
+      } catch (error) {
+        return { status: 'error', message: error.message };
+      }
+    },
+
+    // Revoke all
+    async revokeAll(userId: string) {
+      try {
+        const response = await revokeAll(userId);
         return { status: 'success', data: response };
       } catch (error) {
         return { status: 'error', message: error.message };

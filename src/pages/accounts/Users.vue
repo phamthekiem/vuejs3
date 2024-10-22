@@ -120,7 +120,7 @@ import CreateUserModal from '@/components/account/CreateUserModal.vue';
 import EditUserModal from '@/components/account/EditUserModal.vue';
 import { useUserStore } from '@/store/userStore';
 import { computed, defineComponent, onMounted, ref } from 'vue';
-
+import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'User',
   components: {
@@ -137,6 +137,8 @@ export default defineComponent({
     const selectedUser = ref(null);
     const isEditUserModalVisible = ref(false);
     const searchQuery = ref('');
+
+    const router = useRouter();
 
     // Activity modal
     const isActivityModalVisible = ref(false);
@@ -159,7 +161,6 @@ export default defineComponent({
         selectedUser.value = selectedUsers.value[0]; 
         await fetchActivities();
         isActivityModalVisible.value = true;
-        console.log(newUsers.value, 'Data before opening modal');
       }
     };
 
@@ -262,6 +263,14 @@ export default defineComponent({
       }
     };
 
+    // Revoke all
+    const revokeAll = async () => {
+      if (hasSelectedUsers.value) {
+        await userStore.revokeAll(selectedUsers.value[0].id);
+        router.push('/login');
+      }
+    };
+
     return {
       users,
       fields,
@@ -287,6 +296,7 @@ export default defineComponent({
       getActivityModal,
       isActivityModalVisible,
       newUsers,
+      revokeAll,
     };
   },
 });
