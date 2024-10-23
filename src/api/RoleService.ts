@@ -34,7 +34,7 @@ export const getRolesNames = async () => {
 };
 
 // Get role permissions
-export const getRolePermissions = async (roleId: string) => {
+export const getRolePermissions = async () => {
   try {
     const response = await apiClient.get('/id/Role/GetPermissions');
     return response.data;

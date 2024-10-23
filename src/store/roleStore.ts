@@ -1,6 +1,7 @@
 import {
   createRole,
-  fetchRoles
+  fetchRoles,
+  getRolePermissions
 } from "@/api/RoleService";
 import { defineStore } from "pinia";
 
@@ -8,6 +9,7 @@ export interface Role {
   id: string;
   name: string;
   usersCount: number;
+  permissions: string[];
   users: {
     userName: string;
     email: string;
@@ -37,10 +39,21 @@ export const useRoleStore = defineStore('role', {
       }
     },
 
-    // Add role
-    async addRole(roleName: string) {
+    // Fetch role permissions
+    async fetchRolePermissions() {
       try {
-        const response = await createRole({ name: roleName });
+        const response = await getRolePermissions();
+        return response.data;
+      } catch (error) {
+        console.error('Error', error);
+        return { status: 'error', message: error.message };
+      }
+    },
+
+    // Add role
+    async createRole(roleData: Role) {
+      try {
+        const response = await createRole(roleData);
         this.roles.push(response.data);
       } catch (error) {
         console.error('Error', error);
