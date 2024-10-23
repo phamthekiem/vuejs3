@@ -108,7 +108,7 @@ export const revokeAll = async (userId: string) => {
   }
 };
 
-// Fetch roles
+// Fetch roles names
 export const getRoles = async () => {
   try {
     const response = await apiClient.get('/id/Role/GetNames');

@@ -6,7 +6,7 @@ export default [
   },
   {
     title: 'Roles & Permission',
-    to: { name: 'second-page' },
+    to: { name: 'accounts-roles' },
     icon: { icon: 'ri-shield-user-line' },
   },
 ]
