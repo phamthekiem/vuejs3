@@ -5,28 +5,29 @@
     hide-footer
     centered
     @hide="handleHide"
+    size="lg"
   >
-    <b-form @submit.prevent="saveUserChanges">
-      <b-form-group label="Email Address *">
+    <b-form @submit.prevent="saveUserChanges" class="row">
+      <b-form-group label="Email Address *" class="col-md-6 col-12">
         <b-form-input type="email" :placeholder="localUser.email" required readonly ></b-form-input>
       </b-form-group>
-      <b-form-group label="User Name *">
+      <b-form-group label="User Name *" class="col-md-6 col-12">
         <b-form-input v-model="localUser.userName" required></b-form-input>
       </b-form-group>
-      <b-form-group label="Full Name">
+      <b-form-group label="Full Name" class="col-md-6 col-12">
         <b-form-input v-model="localUser.fullName"></b-form-input>
       </b-form-group>
-      <b-form-group label="Department">
+      <b-form-group label="Department" class="col-md-6 col-12">
         <b-form-select v-model="localUser.department" :options="departmentOptions"></b-form-select>
       </b-form-group>
-      <b-form-group label="Roles">
+      <b-form-group label="Roles" class="col-12">
         <b-form-select 
           v-model="localUser.roles" 
           :options="roleOptions"
         ></b-form-select>
       </b-form-group>
-      <b-button type="button" variant="secondary" @click="closeModal">Cancel</b-button>
-      <b-button type="submit" variant="primary">Update User</b-button>
+      <b-button type="button" variant="secondary" @click="closeModal" class="col-md-6 col-12">Cancel</b-button>
+      <b-button type="submit" variant="primary" class="col-md-6 col-12">Update User</b-button>
     </b-form>
   </b-modal>
 </template>
@@ -44,8 +45,7 @@ export default defineComponent({
     },
     user: {
       type: Object,
-      required: true,
-      default: () => ({}),
+      default: () => null,
     },
   },
 

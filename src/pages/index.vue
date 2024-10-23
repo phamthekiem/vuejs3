@@ -34,7 +34,7 @@ import { useRouter } from 'vue-router';
 
 export default defineComponent({
   components: {
-    LoginPage
+    LoginPage,
   },
   setup() {
     const router = useRouter(); 

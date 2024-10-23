@@ -88,6 +88,27 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // Update user lock status
+    async updateUserLockStatus(userId: string, lockedOut: boolean) {
+      try {
+        const existingUser = this.users.find(user => user.id === userId);
+        if (existingUser) {
+          const updatedUser = { ...existingUser, lockedOut: lockedOut }; 
+          const response = await updateUser(updatedUser);
+          const index = this.users.findIndex(user => user.id === userId);
+          if (index !== -1) {
+            this.users[index].lockedOut = lockedOut;
+          }
+          return { status: 'success', data: response };
+        } else {
+          throw new Error('User not found');
+        }
+      } catch (error) {
+        console.error('Error updating user lock status', error);
+        return { status: 'error', message: error.message };
+      }
+    },
+
     // Login user
     async loginUser(email: string, password: string, reCaptcha: string, rememberMe: boolean) {
       try {

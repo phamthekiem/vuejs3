@@ -55,8 +55,7 @@ export default defineComponent({
     },
     user: {
       type: Object,
-      required: true,
-      default: () => ({}),
+      default: () => null,
     },
   },
   setup(props, { emit }) {
@@ -128,13 +127,12 @@ export default defineComponent({
     };
 
     const confirmRevokeUserId = () => {
-      if (selectedActivity.value) {
+      if (selectedActivity.value && props.user) {
         const userId = props.user?.id;
         const signedInAt = selectedActivity.value.signInAtRaw;
 
         userStore.revokeUser(userId, signedInAt);
         handleRevokeModalHide();
-        emit('update:isVisible', false);
       }
     };
 

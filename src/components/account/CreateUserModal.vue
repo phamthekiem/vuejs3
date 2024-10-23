@@ -4,28 +4,30 @@
     title="Create New User" 
     @hide="resetForm"
     hide-footer
+    centered
+    size="lg"
   >
-    <b-form @submit.prevent="createNewUser">
-      <b-form-group label="Email Address *">
+    <b-form @submit.prevent="createNewUser" class="row">
+      <b-form-group label="Email Address *" class="col-md-6 col-12">
         <b-form-input type="email" v-model="newUser.email" required></b-form-input>
       </b-form-group>
-      <b-form-group label="User Name *">
+      <b-form-group label="User Name *" class="col-md-6 col-12">
         <b-form-input v-model="newUser.userName" required></b-form-input>
       </b-form-group>
-      <b-form-group label="Password *">
+      <b-form-group label="Password *" class="col-md-6 col-12">
         <b-form-input type="password" v-model="newUser.password" required></b-form-input>
       </b-form-group>
-      <b-form-group label="Confirm password *">
+      <b-form-group label="Confirm password *" class="col-md-6 col-12">
         <b-form-input type="password" v-model="newUser.confirmPassword" required></b-form-input>
       </b-form-group>
 
-      <b-form-group label="Full Name">
+      <b-form-group label="Full Name" class="col-md-6 col-12">
         <b-form-input v-model="newUser.fullName"></b-form-input>
       </b-form-group>
-      <b-form-group label="Department">
+      <b-form-group label="Department" class="col-md-6 col-12">
         <b-form-select v-model="newUser.department" :options="departmentOptions"></b-form-select>
       </b-form-group>
-      <b-form-group label="Roles">
+      <b-form-group label="Roles" class="col-md-12">
         <b-form-select v-model="newUser.roles" :options="roleOptions"></b-form-select>
       </b-form-group>
 
@@ -33,8 +35,8 @@
         {{ errorMessage }}
       </div>
 
-      <b-button type="button" variant="secondary" @click="closeModal">Cancel</b-button>
-      <b-button type="submit" variant="primary">Create User</b-button>
+      <b-button type="button" variant="secondary" @click="closeModal" class="col-md-6 col-12">Cancel</b-button>
+      <b-button type="submit" variant="primary" class="col-md-6 col-12" >Create User</b-button>
     </b-form>
   </b-modal>
 </template>

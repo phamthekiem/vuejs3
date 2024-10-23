@@ -95,7 +95,14 @@
         {{ data.item.twoFAEnabled ? 'Enabled' : 'Disabled' }}
       </template>
       <template #cell(locked)="data">
-        {{ data.item.lockedOut ? 'Locked' : 'Unlocked' }}
+        <!-- {{ data.item.lockedOut ? 'Locked' : 'Unlocked' }} -->
+        <b-form-checkbox 
+          switch
+          v-model="data.item.lockedOut"
+          @change="updateUserLockStatus(data.item.id, data.item.lockedOut)"
+        >
+          {{ data.item.lockedOut ? 'Locked' : 'Unlocked' }}
+        </b-form-checkbox>
       </template>
     </b-table>
 
@@ -263,6 +270,14 @@ export default defineComponent({
       }
     };
 
+    // Update user lock status
+    const updateUserLockStatus = async (userId) => {
+      const result = await userStore.updateUserLockStatus(userId, selectedUsers.value.lockedOut);
+      if (result.status === 'success') {
+        selectedUsers.value.lockedOut = !selectedUsers.value.lockedOut;
+      }
+    };
+
     // Revoke all
     const revokeAll = async () => {
       if (hasSelectedUsers.value) {
@@ -297,6 +312,7 @@ export default defineComponent({
       isActivityModalVisible,
       newUsers,
       revokeAll,
+      updateUserLockStatus,
     };
   },
 });

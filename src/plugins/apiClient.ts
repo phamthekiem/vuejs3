@@ -1,11 +1,16 @@
 import { apiToken } from '@/config/token';
 import axios from 'axios';
 
+const getSessionId = () => {
+  return sessionStorage.sessionId;
+}
+
 // Create Axios
 const apiClient = axios.create({
   baseURL: 'https://api.cyberonegate.com',
   headers: {
     'Content-Type': 'application/json',
+    'sessionId': getSessionId()
   },
 });
 

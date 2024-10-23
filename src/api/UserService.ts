@@ -30,7 +30,9 @@ export const createUser = async (userData: User) => {
 // Get user by ID
 export const getUserById = async (userId: string) => {
   try {
-    const response = await apiClient.get(`/id/User/GetUser/${userId}`);
+    const response = await apiClient.get('/id/User/GetUser', {
+      params: { id: userId },
+    });
     return response.data;
   } catch (error) {
     throw new Error('Error fetching user');
