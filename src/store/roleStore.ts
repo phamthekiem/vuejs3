@@ -33,7 +33,7 @@ export const useRoleStore = defineStore('role', {
         this.roles = response.data.items;
         this.totalRoles = response.data.itemsCount;
       } catch (error) {
-        console.error('Error', error);
+        console.error('Error fetching roles', error);
         this.roles = [];
         return { status: 'error', message: error.message };
       }
@@ -45,7 +45,7 @@ export const useRoleStore = defineStore('role', {
         const response = await getRolePermissions();
         return response.data;
       } catch (error) {
-        console.error('Error', error);
+        console.error('Error fetching role permissions', error);
         return { status: 'error', message: error.message };
       }
     },
@@ -54,9 +54,10 @@ export const useRoleStore = defineStore('role', {
     async createRole(roleData: Role) {
       try {
         const response = await createRole(roleData);
-        this.roles.push(response.data);
+        this.roles.push(response);
+        return response;
       } catch (error) {
-        console.error('Error', error);
+        console.error('Error creating role', error);
         return { status: 'error', message: error.message };
       }
     },

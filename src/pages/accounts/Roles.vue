@@ -2,25 +2,25 @@
   <div>
     <h3>Roles & Permissions</h3>
     <div class="role-items">
-      <div class="add-role text-end">
+      <div class="add-role text-end mb-3">
         <b-button variant="outline-primary" @click="openAddRoleModal"><i class="ri-add-line"></i> Add Role</b-button>
       </div>
       <AddRoleModal v-model="showAddRoleModal" />
 
       <div class="row list-role">
-        <div class="col-md-3 col-12" v-for="role in roles" :key="role.name">
+        <div class="col-md-3 col-12" v-for="role in roles" :key="role?.name">
           <div class="role-card">
             <div class="role-header mb-2 d-flex justify-content-between">
               <div class="role-avatar d-flex">
-                <span v-for="(user, index) in role.users" :key="index" class="user-img">{{ user.avatar }}</span>
+                <span v-for="(user, index) in role?.users" :key="index" class="user-img">{{ user.avatar }}</span>
               </div>
               <div class="role-actions">
-                <b-button variant="link"><i class="ri-pencil-line"></i></b-button>
-                <b-button variant="link" class="text-danger"><i class="ri-delete-bin-line"></i></b-button>
+                <b-button variant="link" @click="openEditRoleModal(role)"><i class="ri-pencil-line"></i></b-button>
+                <b-button variant="link" class="text-danger" @click="openDeleteRoleModal(role)"><i class="ri-delete-bin-line"></i></b-button>
               </div>
             </div>
-            <div class="role-name font-weight-bold fs-5">{{ role.name }}</div>
-            <div class="user-count text-gray">{{ role.usersCount }} user{{ role.usersCount > 1 ? 's' : '' }}</div>
+            <div class="role-name font-weight-bold fs-5">{{ role?.name }}</div>
+            <div class="user-count text-gray">{{ role?.usersCount }} user{{ role?.usersCount > 1 ? 's' : '' }}</div>
           </div>
         </div>
       </div>
@@ -52,11 +52,27 @@ export default defineComponent({
       showAddRoleModal.value = true;
     };
 
+    // Edit role modal
+    const showEditRoleModal = ref(false);
+    const openEditRoleModal = (role: Role) => {
+      showEditRoleModal.value = true;
+    };
+
+    // Delete role modal
+    const showDeleteRoleModal = ref(false);
+    const openDeleteRoleModal = (role: Role) => {
+      showDeleteRoleModal.value = true;
+    };
+
 
     return { 
       roles,
       showAddRoleModal,
       openAddRoleModal,
+      showEditRoleModal,
+      openEditRoleModal,
+      showDeleteRoleModal,
+      openDeleteRoleModal,
     };
 
 
