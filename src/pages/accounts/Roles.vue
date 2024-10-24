@@ -5,6 +5,7 @@
       <div class="add-role text-end mb-3">
         <b-button variant="outline-primary" @click="openAddRoleModal"><i class="ri-add-line"></i> Add Role</b-button>
       </div>
+      <!-- Add role modal -->
       <AddRoleModal v-model="showAddRoleModal" />
 
       <div class="row list-role">
@@ -24,20 +25,38 @@
           </div>
         </div>
       </div>
+
+      <!-- Edỉt role modal -->
+      <EditRoleModal v-model="showEditRoleModal" :role="selectedRole" @roleUpdated="updateRole" />
+
+      <!-- Delete role modal -->
+      <DeleteRoleModal v-model="showDeleteRoleModal" :role="selectedRole" @roleDeleted="deleteRole" />
+
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import AddRoleModal from '@/components/account/AddRoleModal.vue';
+import DeleteRoleModal from '@/components/account/DeleteRoleModal.vue';
+import EditRoleModal from '@/components/account/EditRoleModal.vue';
 import { useRoleStore } from '@/store/roleStore';
 import { computed, defineComponent, onMounted } from 'vue';
 export default defineComponent({
   name: 'Roles',
   components: {
-    AddRoleModal
+    AddRoleModal,
+    DeleteRoleModal,
+    EditRoleModal,
   },
   setup() {
+    interface Role {
+      id: string;
+      name: string;
+      usersCount: number;
+      permissions: string[];
+      users: { userName: string; email: string; avatar: string | null; fullName: string }[];
+    }
     const roleStore = useRoleStore();
     
     // Fetch roles
@@ -54,14 +73,17 @@ export default defineComponent({
 
     // Edit role modal
     const showEditRoleModal = ref(false);
+    const selectedRole = ref<Role | null>(null);
     const openEditRoleModal = (role: Role) => {
       showEditRoleModal.value = true;
+      selectedRole.value = role;
     };
 
     // Delete role modal
     const showDeleteRoleModal = ref(false);
     const openDeleteRoleModal = (role: Role) => {
       showDeleteRoleModal.value = true;
+      selectedRole.value = role;
     };
 
 
