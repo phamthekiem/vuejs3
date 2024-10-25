@@ -1,7 +1,9 @@
 import {
   createRole,
+  deleteRole,
   fetchRoles,
-  getRolePermissions
+  getRolePermissions,
+  updateRole
 } from "@/api/RoleService";
 import { defineStore } from "pinia";
 
@@ -62,5 +64,26 @@ export const useRoleStore = defineStore('role', {
       }
     },
 
+    // Edit role
+    async updateRole(roleData: Role) {
+      try {
+        const response = await updateRole(roleData);
+        return response;
+      } catch (error) {
+        console.error('Error updating role', error);
+        return { status: 'error', message: error.message };
+      }
+    },
+
+    // Delete role
+    async deleteRole(roleId: string) {
+      try {
+        const response = await deleteRole(roleId);
+        return response;
+      } catch (error) {
+        console.error('Error deleting role', error);
+        return { status: 'error', message: error.message };
+      }
+    }
   }
 });

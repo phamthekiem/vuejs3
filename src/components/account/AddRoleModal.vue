@@ -148,15 +148,16 @@ export default defineComponent({
     onMounted(async () => {
       try {
         const response = await roleStore.fetchRolePermissions();
-        permissionsTree.value = buildPermissionTree(response); 
+        const activePermissions = response.permissions;
+        permissionsTree.value = buildPermissionTree(response, activePermissions || []); 
       } catch (error) {
         console.error('Error fetching permissions:', error);
       }
     });
 
-    const buildPermissionTree = (permissions: string[]): PermissionNode[] => {
+    const buildPermissionTree = (permissions: string[], activePermissions: string[]): PermissionNode[] => {
       const root: PermissionNode[] = [];
-      
+
       permissions.forEach((permissionString) => {
         const parts = permissionString.split('.');
         let currentLevel = root;
@@ -165,10 +166,10 @@ export default defineComponent({
           let existingNode = currentLevel.find((node) => node.name === part);
 
           if (!existingNode) {
-            existingNode = { name: part, children: [] };
+            existingNode = { name: part, children: [], isChecked: activePermissions.includes(part) }; // Update isChecked
             currentLevel.push(existingNode);
           }
-          currentLevel = existingNode.children || []; 
+          currentLevel = existingNode.children || [];
         });
       });
 

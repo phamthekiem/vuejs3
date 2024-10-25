@@ -1,4 +1,4 @@
-import apiClient from '@/plugins/apiClient';
+import apiClient from '@/config/apiClient';
 import { User } from '@/store/userStore';
 
 // Fetch users with pagination
